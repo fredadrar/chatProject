@@ -61,7 +61,7 @@ public class WebService {
 	@Path("/getPosts")
 	@Produces(MediaType.APPLICATION_JSON)
 
-	public Response getPosts() {
+	public Response getPosts() throws Exception {
 		Gson gson = new Gson();
 		ArrayList<PostBean> listePosts = BddAccess.getPosts();
 		return Response.status(200).entity(gson.toJson(listePosts)).build();
@@ -73,7 +73,7 @@ public class WebService {
 	@Path("/sendUser")
 	@Consumes(MediaType.APPLICATION_JSON)
 
-	public Response sendUser(String jsonUser) {
+	public Response sendUser(String jsonUser) throws Exception {
 		Gson gson = new Gson();
 		UserBean user = gson.fromJson(jsonUser, UserBean.class);
 
@@ -87,9 +87,9 @@ public class WebService {
 	@Path("/getUsers")
 	@Produces(MediaType.APPLICATION_JSON)
 
-	public Response getUsers() {
+	public Response getUsers() throws Exception {
 		Gson gson = new Gson();
-		ArrayList<UserBean> listeUsers = BddAccess.getUsers();
+		ArrayList<UserBean> listeUsers = BddAccess.getConnectedUsers();
 		return Response.status(200).entity(gson.toJson(listeUsers)).build();
 	}
 }

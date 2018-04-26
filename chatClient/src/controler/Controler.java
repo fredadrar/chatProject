@@ -1,5 +1,7 @@
 package controler;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 import dao.PostBean;
@@ -38,7 +40,7 @@ public class Controler {
 
 	/*
 	 * public void sendPost() {
-	 * 
+	 *
 	 * }
 	 */
 
@@ -80,7 +82,10 @@ public class Controler {
 	public void clickPseudo(String pseudo) {
 		UserBean userTemp = new UserBean();
 		userTemp.setPseudo(pseudo);
-		userTemp.setConnected(true);
+
+		long time = Instant.ofEpochMilli(0L).until(Instant.now(), ChronoUnit.MILLIS);
+		userTemp.setLastRequestTime(time);
+
 		try {
 			WsUtils.sendUser(user);
 			user = userTemp;
