@@ -61,10 +61,20 @@ public class WebService {
 	@Path("/getPosts")
 	@Produces(MediaType.APPLICATION_JSON)
 
-	public Response getPosts() throws Exception {
+	public Response getPosts() {
 		Gson gson = new Gson();
-		ArrayList<PostBean> listePosts = BddAccess.getPosts();
-		return Response.status(200).entity(gson.toJson(listePosts)).build();
+		ArrayList<PostBean> listePosts;
+
+		try {
+			listePosts = BddAccess.getPosts();
+			return Response.status(200).entity(gson.toJson(listePosts)).build();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			ErrorBean errorBean = new ErrorBean(e.getMessage());
+			return Response.status(253).entity(gson.toJson(errorBean)).build();
+		}
+
 	}
 
 	// Envoyer un user à la base :
@@ -73,12 +83,19 @@ public class WebService {
 	@Path("/sendUser")
 	@Consumes(MediaType.APPLICATION_JSON)
 
-	public Response sendUser(String jsonUser) throws Exception {
+	public Response sendUser(String jsonUser) {
 		Gson gson = new Gson();
-		UserBean user = gson.fromJson(jsonUser, UserBean.class);
+		try {
+			UserBean user = gson.fromJson(jsonUser, UserBean.class);
+			BddAccess.saveUser(user);
+			return Response.status(200).build();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			ErrorBean errorBean = new ErrorBean(e.getMessage());
+			return Response.status(253).entity(gson.toJson(errorBean)).build();
+		}
 
-		BddAccess.saveUser(user);
-		return Response.status(200).build();
 	}
 
 	// Récupérer les users de la base :
@@ -87,9 +104,17 @@ public class WebService {
 	@Path("/getUsers")
 	@Produces(MediaType.APPLICATION_JSON)
 
-	public Response getUsers() throws Exception {
+	public Response getUsers() {
 		Gson gson = new Gson();
-		ArrayList<UserBean> listeUsers = BddAccess.getConnectedUsers();
-		return Response.status(200).entity(gson.toJson(listeUsers)).build();
+		ArrayList<UserBean> listeUsers;
+		try {
+			listeUsers = BddAccess.getConnectedUsers();
+			return Response.status(200).entity(gson.toJson(listeUsers)).build();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			ErrorBean errorBean = new ErrorBean(e.getMessage());
+			return Response.status(253).entity(gson.toJson(errorBean)).build();
+		}
 	}
 }
