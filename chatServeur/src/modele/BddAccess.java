@@ -6,9 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 
 import dao.PostBean;
 import dao.UserBean;
@@ -68,9 +67,6 @@ public class BddAccess {
 			}
 		}
 	}
-	// else {
-	// throw new Exception("Ce user existe déjà !");
-	// }
 
 	public static boolean checkIfUserExists(UserBean user) throws Exception {
 		Connection con = null;
@@ -105,14 +101,15 @@ public class BddAccess {
 	public static ArrayList<UserBean> getConnectedUsers() throws Exception {
 		Connection con = null;
 		PreparedStatement stmt = null;
-		long currentTime = Instant.ofEpochMilli(0L).until(Instant.now(), ChronoUnit.MILLIS);
+		Date now = new Date();
+		long time = now.getTime();
 		ArrayList<UserBean> listeUsers = new ArrayList<>();
 
 		try {
 			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
 			con = DriverManager.getConnection(URL, LOGIN, PASSWORD);
 			stmt = con.prepareStatement(QUERY_FIND_CONNECTED_USERS);
-			stmt.setLong(1, currentTime - 300000);
+			stmt.setLong(1, time - 300000);
 
 			ResultSet resultSet = stmt.executeQuery();
 			while (resultSet.next()) {
@@ -137,6 +134,7 @@ public class BddAccess {
 		PreparedStatement stmtGetUserId = null;
 
 		try {
+			updateUserTimestamp(message.getUser());
 			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
 			con = DriverManager.getConnection(URL, LOGIN, PASSWORD);
 
@@ -163,7 +161,6 @@ public class BddAccess {
 					e.printStackTrace();
 				}
 			}
-			// listePosts = getPosts();
 		}
 	}
 
@@ -256,17 +253,18 @@ public class BddAccess {
 	public static void updateUserTimestamp(UserBean user) throws Exception {
 		Connection con = null;
 		PreparedStatement stmt = null;
-		long currentTime = Instant.ofEpochMilli(0L).until(Instant.now(), ChronoUnit.MILLIS);
+		Date now = new Date();
+		long time = now.getTime();
 
 		try {
 			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
 			con = DriverManager.getConnection(URL, LOGIN, PASSWORD);
 
 			stmt = con.prepareStatement(QUERY_UPDATE_USER);
-			stmt.setLong(1, currentTime);
+			stmt.setLong(1, time);
 			stmt.setString(2, user.getPseudo());
 
-			stmt.executeUpdate(QUERY_UPDATE_USER);
+			stmt.executeUpdate();
 
 		} finally {
 			if (con != null) {// On ferme la connexion
